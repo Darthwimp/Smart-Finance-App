@@ -4,8 +4,8 @@ import '../models/transaction_model.dart';
 
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, List<TransactionModel>>(
-  (ref) => TransactionNotifier(),
-);
+      (ref) => TransactionNotifier(),
+    );
 
 class TransactionNotifier extends StateNotifier<List<TransactionModel>> {
   TransactionNotifier() : super([]) {
@@ -23,11 +23,16 @@ class TransactionNotifier extends StateNotifier<List<TransactionModel>> {
     state = box.values.toList();
   }
 
-
-  Future<void> updateTransaction(int index, TransactionModel updated) async {
+  Future<void> updateTransaction({
+    required List<TransactionModel> transactions,
+    required TransactionModel updatedTx,
+  }) async {
     final box = Hive.box<TransactionModel>('transactions');
-    await box.putAt(index, updated);
-    state = box.values.toList();
+    final index = transactions.indexWhere((tx) => tx.id == updatedTx.id);
+    if (index != -1) {
+      await box.putAt(index, updatedTx);
+      state = box.values.toList();
+    }
   }
 
   Future<void> deleteTransaction(int index) async {
