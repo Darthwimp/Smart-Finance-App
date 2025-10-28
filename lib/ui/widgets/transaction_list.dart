@@ -42,7 +42,7 @@ class TransactionList extends ConsumerWidget {
                 action: SnackBarAction(
                   label: 'Undo',
                   onPressed: () async {
-                    await notifier.addTransaction(deletedTx);
+                    await notifier.insertTransactionAt(deletedTx, index);
                   },
                 ),
               ),

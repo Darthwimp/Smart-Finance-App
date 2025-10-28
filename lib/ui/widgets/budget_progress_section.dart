@@ -14,7 +14,6 @@ class BudgetProgressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -55,8 +54,8 @@ class BudgetProgressSection extends StatelessWidget {
                       final color = ratio < 0.7
                           ? Colors.green
                           : ratio < 1
-                              ? Colors.orange
-                              : Colors.red;
+                          ? Colors.orange
+                          : Colors.red;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),

@@ -34,10 +34,19 @@ class TransactionNotifier extends StateNotifier<List<TransactionModel>> {
     state = updatedList;
   }
 
-  Future<void> deleteTransaction(int index) async {
+  Future<TransactionModel?> deleteTransaction(int index) async {
+    if (index < 0 || index >= state.length) return null;
     final box = await Hive.openBox<TransactionModel>('transactions');
-    final tx = state[index];
-    await box.delete(tx.id);
-    state = [...state]..removeAt(index);
+    final deletedTx = state[index];
+    await box.delete(deletedTx.id);
+    state = [...state.sublist(0, index), ...state.sublist(index + 1)];
+    return deletedTx;
+  }
+
+  Future<void> insertTransactionAt(TransactionModel tx, int index) async {
+    final newList = [...state];
+    if (index > newList.length) index = newList.length;
+    newList.insert(index, tx);
+    state = newList;
   }
 }

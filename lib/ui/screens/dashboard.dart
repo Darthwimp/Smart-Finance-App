@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_finance_app/models/transaction_model.dart';
 import 'package:smart_finance_app/providers/budget_provider.dart';
+import 'package:smart_finance_app/providers/theme_provider.dart';
 import 'package:smart_finance_app/providers/transaction_provider.dart';
 import 'package:smart_finance_app/ui/screens/settings_page.dart';
+import 'package:smart_finance_app/ui/widgets/animated_gradient_background.dart';
 import 'package:smart_finance_app/ui/widgets/budget_progress_section.dart';
 import 'package:smart_finance_app/ui/widgets/dashboard_header_section.dart';
 import 'package:smart_finance_app/ui/widgets/recent_transactions_list.dart';
@@ -23,6 +25,7 @@ class DashboardScreen extends ConsumerWidget {
     );
 
     final categoryTotals = _getCategoryTotals(transactions);
+    final isDarkMode = ref.watch(themeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,30 +40,33 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final padding = width < 400 ? 12.0 : 16.0;
-
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HeaderSection(totalExpenses: totalExpenses),
-                const SizedBox(height: 20),
-                SpendingChartSection(categoryTotals: categoryTotals),
-                const SizedBox(height: 20),
-                BudgetProgressSection(
-                  budgets: budgets,
-                  categoryTotals: categoryTotals,
-                ),
-                const SizedBox(height: 20),
-                RecentTransactionsSection(transactions: transactions),
-              ],
-            ),
-          );
-        },
+      body: AnimatedGradientBackground(
+        isDarkMode: isDarkMode,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final padding = width < 400 ? 12.0 : 16.0;
+        
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HeaderSection(totalExpenses: totalExpenses),
+                  const SizedBox(height: 20),
+                  SpendingChartSection(categoryTotals: categoryTotals),
+                  const SizedBox(height: 20),
+                  BudgetProgressSection(
+                    budgets: budgets,
+                    categoryTotals: categoryTotals,
+                  ),
+                  const SizedBox(height: 20),
+                  RecentTransactionsSection(transactions: transactions),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
