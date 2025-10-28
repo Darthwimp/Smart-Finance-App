@@ -5,7 +5,7 @@ import 'package:smart_finance_app/providers/budget_provider.dart';
 import 'package:smart_finance_app/providers/transaction_provider.dart';
 import 'package:smart_finance_app/ui/widgets/budget_progress_section.dart';
 import 'package:smart_finance_app/ui/widgets/dashboard_header_section.dart';
-import 'package:smart_finance_app/ui/widgets/recent_transactions_section.dart';
+import 'package:smart_finance_app/ui/widgets/recent_transactions_list.dart';
 import 'package:smart_finance_app/ui/widgets/spending_chart_section.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -45,6 +45,7 @@ class DashboardScreen extends ConsumerWidget {
                 BudgetProgressSection(
                   budgets: budgets,
                   categoryTotals: categoryTotals,
+                  
                 ),
                 const SizedBox(height: 20),
                 RecentTransactionsSection(transactions: transactions),

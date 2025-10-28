@@ -41,4 +41,9 @@ class BudgetNotifier extends StateNotifier<List<BudgetModel>> {
     await box.clear();
     state = [];
   }
+  Future<void> setBudget(BudgetModel budget) async {
+    final box = await Hive.openBox<BudgetModel>('budgets');
+    await box.put(budget.category, budget);
+    state = [...state.where((b) => b.category != budget.category), budget];
+  }
 }

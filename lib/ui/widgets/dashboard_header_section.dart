@@ -16,7 +16,6 @@ class HeaderSection extends StatelessWidget {
         if (width > 330)
           _buildAddAndViewButton(context)
         else
-          // On smaller phones, stack below the card
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: _buildAddAndViewButton(context),

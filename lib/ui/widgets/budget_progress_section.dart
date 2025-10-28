@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/budget_model.dart';
+import 'package:smart_finance_app/ui/screens/budget_page.dart';
 
 class BudgetProgressSection extends StatelessWidget {
-  final List<BudgetModel> budgets;
+  final List budgets;
   final Map<String, double> categoryTotals;
 
   const BudgetProgressSection({
@@ -21,41 +21,67 @@ class BudgetProgressSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Budget Progress',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            ...budgets.map((budget) {
-              final spent = categoryTotals[budget.category] ?? 0;
-              final double progress =
-                  budget.limit == 0 ? 0.0 : (spent / budget.limit).clamp(0, 1.0);
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${budget.category} - ₹${spent.toStringAsFixed(0)} / ₹${budget.limit.toStringAsFixed(0)}',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 10,
-                        backgroundColor: Colors.grey.shade300,
-                        color: progress > 0.9
-                            ? Colors.red
-                            : progress > 0.7
-                                ? Colors.orange
-                                : Colors.green,
-                      ),
-                    ),
-                  ],
+            Row(
+              children: [
+                const Text(
+                  'Budgets',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              );
-            }),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const BudgetPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Set / Edit Budget'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            budgets.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('No budgets set yet.'),
+                    ),
+                  )
+                : Column(
+                    children: budgets.map<Widget>((budget) {
+                      final spent = categoryTotals[budget.category] ?? 0;
+                      final ratio = spent / budget.limit;
+                      final color = ratio < 0.7
+                          ? Colors.green
+                          : ratio < 1
+                              ? Colors.orange
+                              : Colors.red;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${budget.category} — ₹${spent.toStringAsFixed(2)} / ₹${budget.limit.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: color,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            LinearProgressIndicator(
+                              value: ratio.clamp(0, 1),
+                              color: color,
+                              backgroundColor: Colors.grey.shade300,
+                              minHeight: 8,
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
           ],
         ),
       ),

@@ -9,7 +9,7 @@ import 'package:smart_finance_app/ui/screens/transaction_page.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  
+
   Hive.registerAdapter(TransactionModelAdapter());
   Hive.registerAdapter(BudgetModelAdapter());
 
