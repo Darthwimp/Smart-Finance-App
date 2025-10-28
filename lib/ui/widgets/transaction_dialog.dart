@@ -45,7 +45,7 @@ void showTransactionDialog(BuildContext context, WidgetRef ref,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   items: categories
                       .map((cat) =>
                           DropdownMenuItem(value: cat, child: Text(cat)))

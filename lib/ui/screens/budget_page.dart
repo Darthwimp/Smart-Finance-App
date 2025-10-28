@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/budget_model.dart';
+import '../../models/transaction_model.dart';
 import '../../providers/budget_provider.dart';
+import 'package:hive/hive.dart';
 
 class BudgetPage extends ConsumerStatefulWidget {
   const BudgetPage({super.key});
@@ -33,15 +35,28 @@ class _BudgetPageState extends ConsumerState<BudgetPage> {
     }
   }
 
+  double _calculateSpentForCategory(String category) {
+    final transactionsBox = Hive.box<TransactionModel>('transactions');
+    double totalSpent = 0;
+    for (var transaction in transactionsBox.values) {
+      if (transaction.category == category) {
+        totalSpent += transaction.amount;
+      }
+    }
+    return totalSpent;
+  }
+
   @override
   Widget build(BuildContext context) {
     final budgets = ref.watch(budgetProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Budgets')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // --- Add Budget Form ---
             Form(
               key: _formKey,
               child: Row(
@@ -86,40 +101,44 @@ class _BudgetPageState extends ConsumerState<BudgetPage> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // --- Budget List with Progress ---
             Expanded(
               child: ListView.builder(
                 itemCount: budgets.length,
                 itemBuilder: (context, index) {
                   final b = budgets[index];
-                  final progress = b.spent / b.limit;
+                  final spent = _calculateSpentForCategory(b.category);
+                  final progress = (b.limit == 0) ? 0 : spent / b.limit;
                   final color = progress < 0.7
                       ? Colors.green
                       : progress < 1.0
                           ? Colors.orange
                           : Colors.red;
+
                   return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       title: Text(b.category),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           LinearProgressIndicator(
-                            value: progress > 1 ? 1 : progress,
+                            value: (progress > 1 ? 1.0 : progress.toDouble()),
                             color: color,
                             backgroundColor: Colors.grey.shade300,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Spent: ₹${b.spent.toStringAsFixed(0)} / ₹${b.limit.toStringAsFixed(0)}',
+                            'Spent: ₹${spent.toStringAsFixed(0)} / ₹${b.limit.toStringAsFixed(0)}',
                             style: TextStyle(color: color),
                           ),
                         ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () => ref
-                            .read(budgetProvider.notifier)
-                            .deleteBudget(index),
+                        onPressed: () =>
+                            ref.read(budgetProvider.notifier).deleteBudget(index),
                       ),
                     ),
                   );

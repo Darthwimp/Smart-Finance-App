@@ -9,7 +9,8 @@ class HeaderSection extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Expanded(child: _buildTotalCard(context)),
         const SizedBox(width: 10),
