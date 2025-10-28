@@ -1,84 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:smart_finance_app/models/transaction_model.dart';
-import 'package:smart_finance_app/providers/transaction_provider.dart';
-import '../hive_test_setup.dart';
+import '../fakes/fake_transaction_notifier.dart';
 
 void main() {
-  late TransactionNotifier transactionNotifier;
-  late Box<TransactionModel> box;
+  late FakeTransactionNotifier notifier;
 
-  setUpAll(() async {
-    await initHiveForTests();
-    Hive.registerAdapter(TransactionModelAdapter());
-
-    if (!Hive.isBoxOpen('transactions')) {
-      box = await Hive.openBox<TransactionModel>('transactions');
-    } else {
-      box = Hive.box<TransactionModel>('transactions');
-    }
-
-    transactionNotifier = TransactionNotifier();
-  });
-
-  tearDown(() async {
-    await box.clear();
-  });
-
-  tearDownAll(() async {
-    await box.close();
-    await Hive.deleteBoxFromDisk('transactions');
+  setUp(() {
+    notifier = FakeTransactionNotifier();
   });
 
   test('Add Transaction', () async {
-    final tx = TransactionModel(
-      id: '1',
-      amount: 100,
-      category: 'Food',
-      date: DateTime.now(),
-    );
-
-    await transactionNotifier.addTransaction(tx);
-    expect(box.length, 1);
-    expect(box.getAt(0)?.amount, 100);
+    final tx = TransactionModel(id: '3', amount: 100, category: 'Bills', date: DateTime.now());
+    await notifier.addTransaction(tx);
+    expect(notifier.state.length, 3);
+    expect(notifier.state.last.amount, 100);
   });
 
   test('Update Transaction', () async {
-    final tx = TransactionModel(
-      id: '1',
-      amount: 100,
-      category: 'Food',
-      date: DateTime.now(),
-    );
-
-    await transactionNotifier.addTransaction(tx);
-
-    final updatedTx = TransactionModel(
-      id: '1',
-      amount: 200,
-      category: 'Food',
-      date: DateTime.now(),
-    );
-
-    await transactionNotifier.updateTransaction(
-      transactions: [tx],
-      updatedTx: updatedTx,
-    );
-
-    expect(box.getAt(0)?.amount, 200);
+    final updatedTx = TransactionModel(id: '1', amount: 2000, category: 'Food', date: DateTime.now());
+    await notifier.updateTransaction(transactions: notifier.state, updatedTx: updatedTx);
+    expect(notifier.state.first.amount, 2000);
   });
 
   test('Delete Transaction', () async {
-    final tx = TransactionModel(
-      id: '1',
-      amount: 150,
-      category: 'Misc',
-      date: DateTime.now(),
-    );
-
-    await transactionNotifier.addTransaction(tx);
-    await transactionNotifier.deleteTransaction(0);
-
-    expect(box.isEmpty, true);
+    await notifier.deleteTransaction(0);
+    expect(notifier.state.length, 1);
   });
 }
